@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Distributor {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  address     String?
+  phone       String?
+  email       String?
+  Products    Product[]
+}
+
+model Product {
+  id               String            @id
+  name             String
+  description      String?
+  SellingPrices    SellingPrice[]
+  BuyingPrices     BuyingPrice[]
+  BuyingDiscounts  BuyingDiscount[]
+  SellingDiscounts SellingDiscount[]
+  Categories       ProductCategory[]
+  Distributor      Distributor       @relation(fields: [distributorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  distributorId    Int
+}
+
+model BuyingDiscount {
+  id          Int      @id @default(autoincrement())
+  description String
+  value       String
+  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId   String?
+}
+
+model SellingDiscount {
+  id          Int      @id @default(autoincrement())
+  description String
+  value       String
+  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId   String?
+}
+
+model BuyingPrice {
+  id          Int      @id @default(autoincrement())
+  description String
+  value       String
+  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId   String?
+}
+
+model SellingPrice {
+  id          Int      @id @default(autoincrement())
+  description String
+  value       String
+  Product     Product? @relation(fields: [productId], references: [id])
+  productId   String?
+}
+
+model Category {
+  id       Int               @id @default(autoincrement())
+  name     String            @unique
+  Products ProductCategory[]
+}
+
+model ProductCategory {
+  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  Category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+
+  @@id([productId, categoryId])
+}
+
+model Person {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  Debts       Debt[]
+  Payments    Payment[]
+}
+
+model Debt {
+  id          Int     @id @default(autoincrement())
+  description String
+  date        String
+  value       String
+  Person      Person? @relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personId    Int
+}
+
+model Payment {
+  id          Int     @id @default(autoincrement())
+  description String
+  date        String
+  value       String
+  Person      Person? @relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personId    Int
+}
